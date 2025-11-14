@@ -1,63 +1,136 @@
-import Image from "next/image";
+import Link from "next/link";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  BookOpen,
+  Calendar,
+  HelpCircle,
+  Settings,
+  Cross
+} from "lucide-react";
 
 export default function Home() {
+  const menuItems = [
+    {
+      title: "Missale",
+      titleLatin: "MISSALE",
+      description: "Ordinário da Missa",
+      href: "/ordinario",
+      icon: Cross,
+      color: "text-red-600 dark:text-red-400",
+    },
+    {
+      title: "Missale II",
+      titleLatin: "MISSALE II",
+      description: "Ordinário da Missa (2º idioma)",
+      href: "/ordinario?lang=secondary",
+      icon: Cross,
+      color: "text-red-600 dark:text-red-400",
+    },
+    {
+      title: "Calendarium",
+      titleLatin: "CALENDARIUM",
+      description: "Calendário Litúrgico",
+      href: "/calendario",
+      icon: Calendar,
+      color: "text-purple-600 dark:text-purple-400",
+    },
+    {
+      title: "Auxilium",
+      titleLatin: "AUXILIUM",
+      description: "Ajuda e Documentação",
+      href: "/ajuda",
+      icon: HelpCircle,
+      color: "text-blue-600 dark:text-blue-400",
+    },
+    {
+      title: "Dilectus",
+      titleLatin: "DILECTUS",
+      description: "Preferências",
+      href: "/preferencias",
+      icon: Settings,
+      color: "text-green-600 dark:text-green-400",
+    },
+  ];
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      {/* Header */}
+      <header className="border-b bg-card/50 backdrop-blur-sm">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex items-center justify-center gap-3">
+            <BookOpen className="h-8 w-8 text-primary" />
+            <h1 className="text-3xl font-bold tracking-tight">Missale Romanum</h1>
+          </div>
+          <p className="text-center text-sm text-muted-foreground mt-2">
+            Missal Romano em 6 idiomas
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </header>
+
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-12">
+        <div className="max-w-3xl mx-auto space-y-4">
+          {menuItems.map((item, index) => {
+            const Icon = item.icon;
+            return (
+              <Link key={index} href={item.href}>
+                <Card className="transition-all hover:shadow-lg hover:scale-[1.02] hover:border-primary/50">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4">
+                      <div className={`${item.color} p-3 bg-background rounded-lg`}>
+                        <Icon className="h-8 w-8" />
+                      </div>
+                      <div className="flex-1">
+                        <h2 className="text-2xl font-semibold mb-1">
+                          {item.titleLatin}
+                        </h2>
+                        <p className="text-sm text-muted-foreground">
+                          {item.description}
+                        </p>
+                      </div>
+                      <div className="text-muted-foreground">
+                        <svg
+                          className="h-6 w-6"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* Footer Info */}
+        <div className="max-w-3xl mx-auto mt-12 text-center">
+          <Card className="bg-muted/30">
+            <CardContent className="p-6">
+              <p className="text-sm text-muted-foreground mb-2">
+                <strong>Idiomas disponíveis:</strong>
+              </p>
+              <div className="flex flex-wrap justify-center gap-2">
+                {['Português', 'Español', 'Latina', 'English', 'Deutsch', 'Italiano'].map((lang) => (
+                  <span
+                    key={lang}
+                    className="px-3 py-1 bg-background rounded-full text-xs font-medium"
+                  >
+                    {lang}
+                  </span>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </main>
     </div>

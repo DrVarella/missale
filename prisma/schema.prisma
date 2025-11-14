@@ -1,0 +1,216 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Liturgical Color Enum
+enum LiturgicalColor {
+  GREEN    // Ordinary Time
+  PURPLE   // Advent, Lent
+  WHITE    // Christmas, Easter, Feasts
+  RED      // Passion, Martyrs, Holy Spirit
+  ROSE     // 3rd Sunday Advent, 4th Sunday Lent
+  BLACK    // Funeral Masses (optional)
+  GOLD     // Solemn celebrations (optional)
+}
+
+// Liturgical Rank Enum
+enum LiturgicalRank {
+  SOLEMNITY
+  FEAST
+  MEMORIAL
+  OPTIONAL_MEMORIAL
+  FERIAL
+}
+
+// Liturgical Season Enum
+enum LiturgicalSeason {
+  ADVENT
+  CHRISTMAS
+  ORDINARY_TIME
+  LENT
+  HOLY_WEEK
+  EASTER
+}
+
+// Category Enum
+enum MassCategory {
+  ORDINARY       // Ordinary of the Mass
+  SEASONAL       // Liturgical Seasons (Tiempos)
+  SAINTS         // Proper of Saints
+  COMMONS        // Commons
+  VOTIVE         // Votive Masses
+  FUNERAL        // Masses for the Dead
+  VARIOUS        // Various Masses
+  READINGS       // Lectionary
+  PREFACES       // Prefaces
+  EUCHARISTIC    // Eucharistic Prayers
+}
+
+// Multi-language text storage
+model MultiLangText {
+  id        String   @id @default(cuid())
+  pt        String   // Portuguese
+  es        String   // Spanish
+  la        String   // Latin
+  en        String   // English
+  de        String   // German
+  it        String   // Italian
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  titleFor              Mass[]   @relation("MassTitle")
+  entranceAntiphonFor   Mass[]   @relation("EntranceAntiphon")
+  collectFor            Mass[]   @relation("Collect")
+  offeringsFor          Mass[]   @relation("PrayerOverOfferings")
+  communionAntiphonFor  Mass[]   @relation("CommunionAntiphon")
+  postCommunionFor      Mass[]   @relation("PostCommunion")
+  prefaceTextFor        Preface[] @relation("PrefaceText")
+  eucharisticPrayerFor  EucharisticPrayer[] @relation("EPText")
+}
+
+// Main Mass table
+model Mass {
+  id                String           @id @default(cuid())
+  code              String           @unique  // e.g., "A010", "0102", "santos_ene_0102"
+  category          MassCategory
+  season            LiturgicalSeason?
+  rank              LiturgicalRank
+  color             LiturgicalColor
+  date              DateTime?        // For fixed-date celebrations (saints)
+  month             Int?             // 1-12 for saints
+  day               Int?             // 1-31 for saints
+
+  // Multi-language content (foreign keys)
+  titleId                    String
+  title                      MultiLangText @relation("MassTitle", fields: [titleId], references: [id])
+
+  entranceAntiphonId         String?
+  entranceAntiphon           MultiLangText? @relation("EntranceAntiphon", fields: [entranceAntiphonId], references: [id])
+
+  collectId                  String?
+  collect                    MultiLangText? @relation("Collect", fields: [collectId], references: [id])
+
+  prayerOverOfferingsId      String?
+  prayerOverOfferings        MultiLangText? @relation("PrayerOverOfferings", fields: [prayerOverOfferingsId], references: [id])
+
+  communionAntiphonId        String?
+  communionAntiphon          MultiLangText? @relation("CommunionAntiphon", fields: [communionAntiphonId], references: [id])
+
+  postCommunionId            String?
+  postCommunion              MultiLangText? @relation("PostCommunion", fields: [postCommunionId], references: [id])
+
+  // References to other liturgical elements
+  readingsRef                String?      // Reference code to readings
+  prefaceRef                 String?      // Reference code to preface
+  eucharisticPrayerRef       String?      // Reference code to EP
+
+  // Metadata
+  searchText                 String?      // Combined search text for full-text search
+  tags                       String?      // JSON string for filtering: ["advent", "mary", etc.]
+
+  createdAt                  DateTime     @default(now())
+  updatedAt                  DateTime     @updatedAt
+
+  @@index([category])
+  @@index([season])
+  @@index([rank])
+  @@index([month, day])
+  @@index([searchText])
+}
+
+// Lectionary (Readings)
+model Reading {
+  id              String   @id @default(cuid())
+  code            String   @unique  // e.g., "adv_01_domingo", "santos_ene_0102"
+
+  // First Reading
+  firstReadingRef       String?  // e.g., "Is 2:1-5"
+  firstReadingText      String?
+
+  // Responsorial Psalm
+  psalmRef              String?
+  psalmText             String?
+
+  // Second Reading (Sunday/Solemnity)
+  secondReadingRef      String?
+  secondReadingText     String?
+
+  // Gospel
+  gospelRef             String   // e.g., "Mt 24:37-44"
+  gospelText            String?
+
+  // Alleluia verse
+  alleluiaVerse         String?
+
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([code])
+}
+
+// Prefaces
+model Preface {
+  id              String        @id @default(cuid())
+  code            String        @unique  // e.g., "pf001", "pf_advent_1"
+
+  textId          String
+  text            MultiLangText @relation("PrefaceText", fields: [textId], references: [id])
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([code])
+}
+
+// Eucharistic Prayers
+model EucharisticPrayer {
+  id              String        @id @default(cuid())
+  code            String        @unique  // e.g., "ep1", "ep_reconciliation_1"
+  number          Int?          // 1-4 for main EPs
+
+  textId          String
+  text            MultiLangText @relation("EPText", fields: [textId], references: [id])
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([code])
+}
+
+// User Preferences (for future user accounts)
+model UserPreference {
+  id                      String   @id @default(cuid())
+  userId                  String?  @unique  // For future authentication
+
+  primaryLanguage         String   @default("la")  // la, pt, es, en, de, it
+  secondaryLanguage       String?
+  fontSize                Int      @default(16)
+  fontFamily              String   @default("serif")
+  showRubrics             Boolean  @default(true)
+  showBackground          Boolean  @default(false)
+  darkMode                Boolean  @default(false)
+  textPresentation        String   @default("sideBySide")  // sideBySide, alternating, single
+
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+}
+
+// Bookmarks (for future user accounts)
+model Bookmark {
+  id          String   @id @default(cuid())
+  userId      String
+  massId      String
+  note        String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@unique([userId, massId])
+}
