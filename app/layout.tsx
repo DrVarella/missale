@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Crimson_Text, Inter } from "next/font/google";
+import { MassViewProvider } from "@/lib/contexts/MassViewContext";
 import "./globals.css";
 
 const crimsonText = Crimson_Text({
@@ -37,7 +38,9 @@ export default function RootLayout({
       <body
         className={`${crimsonText.variable} ${inter.variable} font-serif antialiased`}
       >
-        {children}
+        <MassViewProvider>
+          {children}
+        </MassViewProvider>
       </body>
     </html>
   );

@@ -40,7 +40,7 @@ enum LiturgicalSeason {
 // Category Enum
 enum MassCategory {
   ORDINARY       // Ordinary of the Mass
-  SEASONAL       // Liturgical Seasons (Tiempos)
+  SEASONS        // Liturgical Seasons (Tiempos)
   SAINTS         // Proper of Saints
   COMMONS        // Commons
   VOTIVE         // Votive Masses
@@ -82,6 +82,7 @@ model Mass {
   season            LiturgicalSeason?
   rank              LiturgicalRank
   color             LiturgicalColor
+  precedence        Int              @default(10)  // Liturgical precedence (lower = higher priority)
   date              DateTime?        // For fixed-date celebrations (saints)
   month             Int?             // 1-12 for saints
   day               Int?             // 1-31 for saints
