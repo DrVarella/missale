@@ -2,13 +2,14 @@ import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { MassViewProvider } from '@/lib/contexts/MassViewContext';
 import { MassToolbar } from '@/components/liturgical/MassToolbar';
+import { MassNavigation } from '@/components/liturgical/MassNavigation';
 import { MultiLangText } from '@/components/liturgical/MultiLangText';
 import { LiturgicalColorBadge } from '@/components/liturgical/LiturgicalColorBadge';
 import { ReadingModeWrapper } from '@/components/liturgical/ReadingModeWrapper';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Home } from 'lucide-react';
+import { Calendar as CalendarIcon, Home } from 'lucide-react';
 import Link from 'next/link';
 
 interface MassPageProps {
@@ -71,18 +72,13 @@ export default async function MassPage({ params }: MassPageProps) {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="sm" title="Dia anterior">
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
+                <MassNavigation currentCode={mass.code} category={mass.category} />
                 <Link href="/calendario">
                   <Button variant="outline" size="sm">
                     <CalendarIcon className="h-4 w-4 mr-2" />
                     Calendário
                   </Button>
                 </Link>
-                <Button variant="ghost" size="sm" title="Próximo dia">
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
               </div>
             </div>
           </div>
